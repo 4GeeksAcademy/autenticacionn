@@ -10,36 +10,62 @@ const Login = () => {
 
 	const handleLogin = async (e) => {
 		e.preventDefault();
+
 		try {
 			const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/login`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify({ email, password })
+				body: JSON.stringify({ email, password }),
 			});
+
 			const data = await res.json();
 
-			if (res.ok && data.access_token) {
-				dispatch({
-					type: "LOGIN",
-					payload: { token: data.access_token, user: data.user }
-				});
-				navigate("/private");
-			} else {
-				alert("Login incorrecto");
+			if (!res.ok) {
+				alert(data.error || "Credenciales inválidas");
+				return;
 			}
+
+			dispatch({
+				type: "LOGIN",
+				payload: {
+					token: data.access_token,
+					user: data.user,
+				},
+			});
+
+			alert("Login exitoso");
+			navigate("/private");
 		} catch (err) {
-			console.error("Login error:", err);
-			alert("Error al intentar iniciar sesión");
+			console.error(err);
+			alert("Error al conectar con el servidor.");
 		}
 	};
 
 	return (
-		<form onSubmit={handleLogin}>
-			<h2>Iniciar sesión</h2>
-			<input type="email" onChange={(e) => setEmail(e.target.value)} placeholder="Email" required />
-			<input type="password" onChange={(e) => setPassword(e.target.value)} placeholder="Contraseña" required />
-			<button type="submit">Entrar</button>
-		</form>
+		<div className="container mt-5">
+			<h2>Iniciar Sesión</h2>
+			<form onSubmit={handleLogin}>
+				<input
+					type="email"
+					className="form-control mb-2"
+					placeholder="Email"
+					value={email}
+					onChange={(e) => setEmail(e.target.value)}
+					required
+				/>
+				<input
+					type="password"
+					className="form-control mb-2"
+					placeholder="Contraseña"
+					value={password}
+					onChange={(e) => setPassword(e.target.value)}
+					required
+				/>
+				<button type="submit" className="btn btn-success">
+					Entrar
+				</button>
+			</form>
+		</div>
 	);
 };
 

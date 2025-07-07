@@ -1,35 +1,29 @@
-import React from "react";
-import { createBrowserRouter, Navigate } from "react-router-dom";
-
-import Home from "./pages/Home.jsx";
-import Login from "./pages/Login.jsx";
-import Signup from "./pages/Signup.jsx";
-import Private from "./pages/Private.jsx";
-import Layout from "./pages/Layout.jsx";
-
-import useGlobalReducer from "./hooks/useGlobalReducer.jsx";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Private from "./pages/Private";
+import Layout from "./pages/Layout";
+import { useContext } from "react";
+import { Context } from "./store/context"; // si usas contexto global
 
 const PrivateRoute = ({ children }) => {
-    const { store } = useGlobalReducer();
-    return store.token ? children : <Navigate to="/login" />;
+  const { store } = useContext(Context);
+  return store.token ? children : <Navigate to="/login" />;
 };
 
-export const router = createBrowserRouter([
-    {
-        path: "/",
-        element: <Layout />,
-        children: [
-            { path: "/", element: <Home /> },
-            { path: "/login", element: <Login /> },
-            { path: "/signup", element: <Signup /> },
-            {
-                path: "/private",
-                element: <PrivateRoute><Private /></PrivateRoute>
-            },
-            {
-                path: "*",
-                element: <h1>404 - Página no encontrada</h1>
-            }
-        ]
-    }
-]);
+const AppRoutes = () => (
+  <BrowserRouter>
+    <Layout>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/private" element={<PrivateRoute><Private /></PrivateRoute>} />
+        <Route path="*" element={<h1>404 Not Found</h1>} />
+      </Routes>
+    </Layout>
+  </BrowserRouter>
+);
+
+export default AppRoutes;
